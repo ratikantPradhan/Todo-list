@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Advanced Daily Todo List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .dark {
+            color-scheme: dark;
+        }
+
+        .sortable-ghost {
+            opacity: 0.5;
+        }
+
+        .sortable-chosen {
+            transform: scale(1.02);
+        }
+
+        .read-more-link {
+            color: #4f46e5;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .read-more-link:hover {
+            color: #3730a3;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 dark:text-white transition-all min-h-screen py-6 px-4">
+    <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 sm:p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">📝 Daily Todo</h1>
+            <label class="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="hidden" id="dark-toggle" class="accent-indigo-600 w-5 h-5" />
+                <!-- for search -->
+                <p><i class="fa-solid fa-magnifying-glass block"></i></p>
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search tasks..."
+                    
+                    class="sm:col-span-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white" />
+                <!-- <span class="select-none">Dark Mode</span> -->
+            </label>
+        </div>
+
+        <!-- Add Task Form -->
+        <form id="todo-form" class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-8">
+            <input
+                type="text"
+                id="todo-input"
+                placeholder="Enter task title"
+                required
+                class="sm:col-span-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white" />
+
+            <input
+                type="date"
+                id="due-date-input"
+                class="sm:col-span-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white" />
+
+            <select
+                id="category-select"
+                class="sm:col-span-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="shopping">Shopping</option>
+
+            </select>
+
+            <select
+                id="priority-select"
+                class="sm:col-span-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white">
+
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <input
+                type="text"
+                id="subtask-input"
+                placeholder="Subtasks (comma separated)"
+                class="sm:col-span-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white" />
+
+            <button
+                type="submit"
+                class="sm:col-span-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg px-4 py-3 transition duration-200">
+                Add
+            </button>
+        </form>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-300 dark:bg-gray-600 h-3 rounded-full mb-6 overflow-hidden">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-500" style="width: 0%"></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-6">
+            <select
+                id="category-filter"
+                class="sm:col-span-3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white">
+                <option value="all">All Categories</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="shopping">Shopping</option>
+            </select>
+
+            <select
+                id="priority-filter"
+                class="sm:col-span-3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white">
+                <option value="all">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <select
+                id="status-filter"
+                class="sm:col-span-3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white">
+                <option value="all">All Tasks</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search tasks..."
+                class="sm:col-span-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-white" />
+        </div>
+
+        <!-- Todo List -->
+        <ul id="todo-list" class="space-y-4"></ul>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-12 text-gray-500 dark:text-gray-400 hidden">
+            <div class="text-6xl mb-4">📋</div>
+            <h3 class="text-xl font-semibold mb-2">No tasks yet</h3>
+            <p>Add your first task to get started!</p>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Edit Task</h2>
+            <input id="edit-text" class="w-full mb-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white" placeholder="Task title" />
+            <input id="edit-date" type="date" class="w-full mb-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white" />
+            <select id="edit-category" class="w-full mb-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="shopping">Shopping</option>
+            </select>
+            <select id="edit-priority" class="w-full mb-4 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <div class="flex gap-2">
+                <button id="save-edit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition">Save</button>
+                <button id="cancel-edit" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
